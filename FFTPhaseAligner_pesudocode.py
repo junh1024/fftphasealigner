@@ -1,5 +1,5 @@
 FFT Phase Aligner
-#FFT in JSFX is even=Re , odd=Im?
+
 use $pi?
 
 fftsize=4096
@@ -12,6 +12,9 @@ get magnitude of in1&2, store in array
 #compute mags of 12
 for(i in fftsize):
 	Magnitudes12[i]=sqrt(re^2+im^2)
+	
+	
+	Magnitudes12[i]=sqrt(fft1[i*2]^2+fft1[i*2+1])#JS ver, FFT in JSFX is even=Re , odd=Im?
 
 get angle of in3&4, store in Angles34
 
