@@ -17,20 +17,31 @@ get magnitude of in1&2, store in array
 for(i in fftsize):
 	Magnitudes12[i]=sqrt(re^2+im^2)
 
-	Magnitudes1[i]=sqrt(fft1[i*2]^2+fft1[i*2+1])#JS ver, FFT in JSFX is even=Re , odd=Im?
-	Magnitudes2[i]=sqrt(fft2[i*2]^2+fft2[i*2+1])#JS ver, FFT in JSFX is even=Re , odd=Im?
-	Magnitudes3[i]=sqrt(fft3[i*2]^2+fft3[i*2+1])#JS ver, FFT in JSFX is even=Re , odd=Im?
-	Magnitudes4[i]=sqrt(fft4[i*2]^2+fft4[i*2+1])#JS ver, FFT in JSFX is even=Re , odd=Im?
+	Magnitudes1[i]=sqrt(fft1[i*2]^2+fft1[i*2+1]^2)#JS ver, FFT in JSFX is even=Re , odd=Im?
+	Magnitudes2[i]=sqrt(fft2[i*2]^2+fft2[i*2+1]^2)
+	Magnitudes3[i]=sqrt(fft3[i*2]^2+fft3[i*2+1]^2)
+	Magnitudes4[i]=sqrt(fft4[i*2]^2+fft4[i*2+1]^2)
 
 get angle of in3&4, store in Angles34
 
 #compute angles of 34
 for (i in fftsize):
 	Angles34[i]=arcsin(im/Magnitudes34[i])
+	
+	Angles3[i]=arcsin(fft3[i*2+1]/Magnitudes3[i])
+	Angles4[i]=arcsin(fft4[i*2+1]/Magnitudes4[i])
+	
 	if(im<0):
 		Angles34[i]=Angles34[i]*-1
 	!!!RADIANS HANDLING
-
+	
+	if(fft3[i*2+1]<0):
+		Angles3[i]=Angles3[i]*-1
+	
+	if(fft4[i*2+1]<0):
+		Angles4[i]=Angles4[i]*-1
+	
+	!!!RADIANS HANDLING
 #Reconstruct in1&2 using Magnitudes12 & Angles34 
 for (i in fftsize):
 	Reconstructed12[i]=Magnitudes12[i]+Angles34[i]
