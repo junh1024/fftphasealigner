@@ -45,7 +45,13 @@ for (i in fftsize):
 #Reconstruct in1&2 using Magnitudes12 & Angles34 
 for (i in fftsize):
 	Reconstructed12[i]=Magnitudes12[i]+Angles34[i]
+	
+	Reconstructed1[2*i]  = Magnitudes1[i]*cos(Angles3[i])#re
+	Reconstructed1[2*i+1]= Magnitudes1[i]*sin(Angles3[i])#im
+	
+	Reconstructed2[2*i]  = Magnitudes1[i]*cos(Angles4[i])
+	Reconstructed2[2*i+1]= Magnitudes1[i]*sin(Angles4[i])
 
 
 
-ifft 1&2
+ifft reconstructed 1&2
