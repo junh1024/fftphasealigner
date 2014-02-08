@@ -1,4 +1,5 @@
 desc: Outputs the difference between channel sets ch1+2 and 3+4 on 1+2, 3+4 left untouched.
+//much code from fft-filter
 
 slider1:10<8,13,1>FFT size (bits)
 
@@ -22,13 +23,6 @@ fftsize=-1;
       tmp+=1;
     );
   );
-  lowband=hfftsize*slider2;
-  hiband=hfftsize*slider3;
-  lowband = min(max(lowband,0),hfftsize);
-  hiband = min(max(hiband,0),hfftsize);
-  lowband > hiband ? ( t=hiband; hiband=lowband; lowband=t; );
-  lowband *= 2;
-  hiband *= 2;
   pdc_top_ch=2;
   pdc_bot_ch=0;
   pdc_delay=fftsize;
