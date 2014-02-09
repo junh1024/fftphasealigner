@@ -1,8 +1,8 @@
 desc:FFT test
+//code from Jonas_Eriksson_Swe & fft-filter
 
 
-
-slider1:0<-1,1,0.0000001>Band 1
+slider1:12<8,14,1>FFT size (bits)
 slider2:0<-1,1,0.0000001>Band 2
 slider3:0<0,1,0.0000001>Band 3
 slider4:0<0,1,0.0000001>Band 4
@@ -28,7 +28,14 @@ buffer = 0;				//starting position for the buffer in the local memory
 pos = 0;
 
 @slider
-pdc_delay=fft_size*2;
+
+  fft_size != (0|(2^slider1)) ? (
+    fft_size=(2^slider1)|0;
+   
+  );
+
+  fft_size_x_two = 2 * fft_size ;	
+pdc_delay=fft_size;
 
 
 @sample
