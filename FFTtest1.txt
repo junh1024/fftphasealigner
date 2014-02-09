@@ -1,0 +1,64 @@
+desc:FFT test
+
+
+
+slider1:0<-1,1,0.0000001>Band 1
+slider2:0<-1,1,0.0000001>Band 2
+slider3:0<0,1,0.0000001>Band 3
+slider4:0<0,1,0.0000001>Band 4
+slider5:0<0,1,0.0000001>Band 5
+slider6:0<0,1,0.0000001>Band 6
+slider7:0<0,1,0.0000001>Band 7
+slider8:0<0,1,0.0000001>Band 8
+slider9:0<0,1,0.0000001>Band 9
+slider10:0<0,1,0.0000001>Band 10
+slider11:0<0,1,0.0000001>Band 11
+slider12:0<0,1,0.0000001>Band 12
+slider13:0<0,1,0.0000001>Band 13
+slider14:0<0,1,0.0000001>Band 14
+slider15:0<0,1,0.0000001>Band 15
+slider16:0<0,1,0.0000001>Band 16
+
+
+
+@init
+fft_size = 4096;
+fft_size_x_two = 2 * fft_size ;		//* 2 because each number in the buffer is complex (has a real and an imaginary part) and thus takes up two positions ( buffer[0] = real, buffer[1] = imaginary, buffer[2] = real, buffer[3] = imaginary etc)
+buffer = 0;				//starting position for the buffer in the local memory
+pos = 0;
+
+@slider
+pdc_delay=fft_size*2;
+
+
+@sample
+
+
+
+pos > fft_size_x_two ?
+(
+  pos = 0;
+  fft( buffer, fft_size );		//wohoo! we're fft:ing!
+  fft_permute( buffer, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
+
+  i=0;
+  loop(fft_size_x_two,
+  buffer[i]*=(1/fft_size)*1;
+  i+=1);
+  
+  fft_ipermute(buffer,fft_size);
+  ifft(buffer,fft_size);
+
+  
+  
+
+);
+
+
+buffer[ pos ] = spl0 ;			//first position in buffer is sample value from left channel (the real part of the complex number)
+buffer[ pos + 1 ] = 0 ;			//second position in the buffer in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer position))
+
+
+//below: if the buffer is full, perform an fft
+spl0=buffer[ pos ];
+pos += 2;
