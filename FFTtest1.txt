@@ -2,7 +2,7 @@ desc:FFT test
 //code from Jonas_Eriksson_Swe & fft-filter
 
 
-slider1:12<8,14,1>FFT size (bits)
+slider1:12<6,14,1>FFT size (bits)
 slider2:0<-1,1,0.0000001>Band 2
 slider3:0<0,1,0.0000001>Band 3
 slider4:0<0,1,0.0000001>Band 4
@@ -22,74 +22,49 @@ slider16:0<0,1,0.0000001>Band 16
 
 
 @init
-fft_size = 4096;
+sixtyfivek=65535;
+fft_size = 64;
 fft_size_x_two = 2 * fft_size ;		//* 2 because each number in the buffer1 is complex (has a real and an imaginary part) and thus takes up two positions ( buffer1[0] = real, buffer1[1] = imaginary, buffer1[2] = real, buffer1[3] = imaginary etc)
-buffer1 = 0;				//starting position for the buffer1 in the local memory
-buffer2 = 1;	//i need to increment this???
-buffer3 = 2;
-buffer4 = 3;
+			//starting position for the buffer1 in the local memory
 pos = 0;
 
-Magnitudes1=4;
-Magnitudes2=5;
-Magnitudes3=6;
-Magnitudes4=7;
+
+buffer1    = (1.0*fft_size_x_two)+sixtyfivek;	
+buffer2    = (2.0*fft_size_x_two)+sixtyfivek;
+buffer3    = (3.0*fft_size_x_two)+sixtyfivek;
+buffer4    = (4.0*fft_size_x_two)+sixtyfivek;
+Magnitudes1= (5.0*fft_size_x_two)+sixtyfivek;
+Magnitudes2= (5.5*fft_size_x_two)+sixtyfivek;
+Magnitudes3= (6.0*fft_size_x_two)+sixtyfivek;
+Magnitudes4= (7.0*fft_size_x_two)+sixtyfivek;
+Angles3    = (8.0*fft_size_x_two)+sixtyfivek;
+Angles4    = (9.0*fft_size_x_two)+sixtyfivek;
 
 @slider
 
   fft_size != (0|(2^slider1)) ? (
     fft_size=(2^slider1)|0;
-   
   );
 
   fft_size_x_two = 2 * fft_size ;	
+
+buffer1    = (1.0*fft_size_x_two)+sixtyfivek;	
+buffer2    = (2.0*fft_size_x_two)+sixtyfivek;
+buffer3    = (3.0*fft_size_x_two)+sixtyfivek;
+buffer4    = (4.0*fft_size_x_two)+sixtyfivek;
+Magnitudes1= (5.0*fft_size_x_two)+sixtyfivek;
+Magnitudes2= (5.5*fft_size_x_two)+sixtyfivek;
+Magnitudes3= (6.0*fft_size_x_two)+sixtyfivek;
+Magnitudes4= (7.0*fft_size_x_two)+sixtyfivek;
+Angles3    = (8.0*fft_size_x_two)+sixtyfivek;
+Angles4    = (9.0*fft_size_x_two)+sixtyfivek;
+    
+pdc_bot_ch=0    ;
+pdc_top_ch=1    ;
 pdc_delay=fft_size;
 
 
 @sample
-
-
-
-pos > fft_size_x_two ?
-(
-	pos = 0;
-	fft( buffer1, fft_size );	
-	fft_permute( buffer1, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
-	
-	fft( buffer2, fft_size );	
-	fft_permute( buffer2, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
-	
-	
-	i=0;
-	loop(fft_size,
-	Magnitudes1[i]=sqrt(buffer1[i*2]^2+buffer1[i*2+1]^2);
-	Magnitudes2[i]=sqrt(buffer2[i*2]^2+buffer2[i*2+1]^2);
-	Magnitudes2[i]=sqrt(buffer2[i*2]^2+buffer2[i*2+1]^2);
-	Magnitudes2[i]=sqrt(buffer2[i*2]^2+buffer2[i*2+1]^2);
-	i+=1);
-	
-	
-	
-	//scaling for correct output
-	i=0;
-	loop(fft_size_x_two,
-	buffer1[i]*=(1/fft_size)*1;
-	buffer2[i]*=(1/fft_size)*1;
-	i+=1);
-	
-	fft_ipermute(buffer2,fft_size);
-	ifft(buffer2,fft_size);
-	
-	
-	fft_ipermute(buffer1,fft_size);
-	ifft(buffer1,fft_size);
-	
-	
-	
-	
-);
-
-
 buffer1[ pos ] = spl0 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
 buffer1[ pos + 1 ] = 0 ;			//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
 
@@ -97,9 +72,95 @@ buffer1[ pos + 1 ] = 0 ;			//second position in the buffer1 in always 0 as the i
 buffer2[ pos ] = spl1 ;	
 buffer2[ pos + 1 ] = 0 ;
 
+pos += 2;
+
+// buffer3[ pos ] = spl2 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
+// buffer3[ pos + 1 ] = 0 ;			//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
+
+
+// buffer4[ pos ] = spl3 ;	
+// buffer4[ pos + 1 ] = 0 ;
 
 
 //below: if the buffer1 is full, perform an fft
-spl0=buffer1[ pos ];
-spl1=buffer2[ pos ];
-pos += 2;
+
+pos > fft_size_x_two ?
+(
+	pos = 0;
+	fft( buffer1, fft_size );	
+	// fft_permute( buffer1, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
+	
+	fft( buffer2, fft_size );
+	// fft_permute( buffer2, fft_size );
+	
+	fft( buffer3, fft_size );
+	// fft_permute( buffer3, fft_size );
+	
+	fft( buffer4, fft_size );
+	// fft_permute( buffer4, fft_size );
+	
+	i=0;
+	loop(fft_size,
+	Magnitudes1[i]=sqrt(buffer1[i*2]^2+buffer1[i*2+1]^2);
+	Magnitudes2[i]=sqrt(buffer2[i*2]^2+buffer2[i*2+1]^2);
+	Magnitudes3[i]=sqrt(buffer3[i*2]^2+buffer3[i*2+1]^2);
+	Magnitudes4[i]=sqrt(buffer4[i*2]^2+buffer4[i*2+1]^2);
+	
+	Angles3[i]=asin(buffer3[i*2+1]/Magnitudes3[i]);
+	Angles4[i]=asin(buffer4[i*2+1]/Magnitudes4[i]);
+	
+	buffer3[(i*2)+1]<0 ? Angles3[i]=Angles3[i]*-1;
+	buffer4[(i*2)+1]<0 ?  Angles4[i]=Angles4[i]*-1 ;
+
+	// buffer1[i*2]  = (Magnitudes1[i]*cos(Angles3[i]));//re
+	// buffer1[i*2+1]= (Magnitudes1[i]*sin(Angles3[i]));//im
+	
+	buffer1[i*2]  = (Magnitudes1[i]*cos(0));//re
+	buffer1[i*2+1]= (Magnitudes1[i]*sin(0));//im
+	// buffer2[i*2]  = (Magnitudes2[i]*cos(Angles4[i]));
+	// buffer2[i*2+1]= (Magnitudes2[i]*sin(Angles4[i]));
+	
+	slider8= buffer1[i*2]  ;
+	slider9= buffer1[i*2+1]  ;
+
+	i+=1;
+	);
+
+	
+	slider2 =Magnitudes1[24];
+	slider3 =Magnitudes2[24];
+	slider4 =Magnitudes3[24];
+	slider5 =Magnitudes4[24];
+	slider6 =Angles3[24];
+	slider7 =Angles4[24];
+	// slider3 =
+	
+	//scaling for correct output
+	i=0;
+	loop(fft_size_x_two,
+	buffer1[i]*=(1/fft_size);
+	buffer2[i]*=(1/fft_size);
+	i+=1);
+	
+		// fft_ipermute(buffer2,fft_size);
+	ifft(buffer2,fft_size);
+	
+	// fft_ipermute(buffer1,fft_size);
+	ifft(buffer1,fft_size);
+	
+
+	
+	// fft_ipermute(buffer3,fft_size);
+	// ifft(buffer3,fft_size);
+	
+	// fft_ipermute(buffer4,fft_size);
+	// ifft(buffer4,fft_size);
+
+);
+
+
+
+spl0= max (min( buffer1[ pos ], 1) ,-1);
+// spl1= max ( min( buffer2[ pos ],1) ,-1);
+// spl2=buffer3[ pos ];
+// spl3=buffer4[ pos ]*0;
