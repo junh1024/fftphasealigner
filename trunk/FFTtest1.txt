@@ -22,23 +22,23 @@ slider16:0<0,1,0.0000001>Band 16
 
 
 @init
-sixtyfivek=65535;
+sixtyfivek=65536;
 fft_size = 64;
 fft_size_x_two = 2 * fft_size ;		//* 2 because each number in the buffer1 is complex (has a real and an imaginary part) and thus takes up two positions ( buffer1[0] = real, buffer1[1] = imaginary, buffer1[2] = real, buffer1[3] = imaginary etc)
 			//starting position for the buffer1 in the local memory
 pos = 0;
 
 
-buffer1    = (1.0*fft_size_x_two)+sixtyfivek;	
-buffer2    = (2.0*fft_size_x_two)+sixtyfivek;
-buffer3    = (3.0*fft_size_x_two)+sixtyfivek;
-buffer4    = (4.0*fft_size_x_two)+sixtyfivek;
-Magnitudes1= (5.0*fft_size_x_two)+sixtyfivek;
-Magnitudes2= (5.5*fft_size_x_two)+sixtyfivek;
-Magnitudes3= (6.0*fft_size_x_two)+sixtyfivek;
-Magnitudes4= (7.0*fft_size_x_two)+sixtyfivek;
-Angles3    = (8.0*fft_size_x_two)+sixtyfivek;
-Angles4    = (9.0*fft_size_x_two)+sixtyfivek;
+buffer1    = (1.0*65536)+sixtyfivek;	
+buffer2    = (2.0*65536)+sixtyfivek;
+buffer3    = (3.0*65536)+sixtyfivek;
+buffer4    = (4.0*65536)+sixtyfivek;
+Magnitudes1= (5.0*65536)+sixtyfivek;
+Magnitudes2= (5.5*65536)+sixtyfivek;
+Magnitudes3= (6.0*65536)+sixtyfivek;
+Magnitudes4= (7.0*65536)+sixtyfivek;
+Angles3    = (8.0*65536)+sixtyfivek;
+Angles4    = (9.0*65536)+sixtyfivek;
 
 @slider
 
@@ -48,16 +48,16 @@ Angles4    = (9.0*fft_size_x_two)+sixtyfivek;
 
   fft_size_x_two = 2 * fft_size ;	
 
-buffer1    = (1.0*fft_size_x_two)+sixtyfivek;	
-buffer2    = (2.0*fft_size_x_two)+sixtyfivek;
-buffer3    = (3.0*fft_size_x_two)+sixtyfivek;
-buffer4    = (4.0*fft_size_x_two)+sixtyfivek;
-Magnitudes1= (5.0*fft_size_x_two)+sixtyfivek;
-Magnitudes2= (5.5*fft_size_x_two)+sixtyfivek;
-Magnitudes3= (6.0*fft_size_x_two)+sixtyfivek;
-Magnitudes4= (7.0*fft_size_x_two)+sixtyfivek;
-Angles3    = (8.0*fft_size_x_two)+sixtyfivek;
-Angles4    = (9.0*fft_size_x_two)+sixtyfivek;
+buffer1    = (1.0*65536)+sixtyfivek;	
+buffer2    = (2.0*65536)+sixtyfivek;
+buffer3    = (3.0*65536)+sixtyfivek;
+buffer4    = (4.0*65536)+sixtyfivek;
+Magnitudes1= (5.0*65536)+sixtyfivek;
+Magnitudes2= (5.5*65536)+sixtyfivek;
+Magnitudes3= (6.0*65536)+sixtyfivek;
+Magnitudes4= (7.0*65536)+sixtyfivek;
+Angles3    = (8.0*65536)+sixtyfivek;
+Angles4    = (9.0*65536)+sixtyfivek;
     
 pdc_bot_ch=0    ;
 pdc_top_ch=1    ;
@@ -74,12 +74,12 @@ buffer2[ pos + 1 ] = 0 ;
 
 pos += 2;
 
-// buffer3[ pos ] = spl2 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
-// buffer3[ pos + 1 ] = 0 ;			//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
+buffer3[ pos ] = spl2 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
+buffer3[ pos + 1 ] = 0 ;			//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
 
 
-// buffer4[ pos ] = spl3 ;	
-// buffer4[ pos + 1 ] = 0 ;
+buffer4[ pos ] = spl3 ;	
+buffer4[ pos + 1 ] = 0 ;
 
 
 //below: if the buffer1 is full, perform an fft
@@ -112,13 +112,12 @@ pos > fft_size_x_two ?
 	buffer3[(i*2)+1]<0 ? Angles3[i]=Angles3[i]*-1;
 	buffer4[(i*2)+1]<0 ?  Angles4[i]=Angles4[i]*-1 ;
 
-	// buffer1[i*2]  = (Magnitudes1[i]*cos(Angles3[i]));//re
-	// buffer1[i*2+1]= (Magnitudes1[i]*sin(Angles3[i]));//im
+	buffer1[i*2]  = (Magnitudes1[i]*cos(Angles3[i]));//re
+	buffer1[i*2+1]= (Magnitudes1[i]*sin(Angles3[i]));//im
 	
-	buffer1[i*2]  = (Magnitudes1[i]*cos(0));//re
-	buffer1[i*2+1]= (Magnitudes1[i]*sin(0));//im
-	// buffer2[i*2]  = (Magnitudes2[i]*cos(Angles4[i]));
-	// buffer2[i*2+1]= (Magnitudes2[i]*sin(Angles4[i]));
+
+	buffer2[i*2]  = (Magnitudes2[i]*cos(Angles4[i]));
+	buffer2[i*2+1]= (Magnitudes2[i]*sin(Angles4[i]));
 	
 	slider8= buffer1[i*2]  ;
 	slider9= buffer1[i*2+1]  ;
@@ -161,6 +160,6 @@ pos > fft_size_x_two ?
 
 
 spl0= max (min( buffer1[ pos ], 1) ,-1);
-// spl1= max ( min( buffer2[ pos ],1) ,-1);
+spl1= max ( min( buffer2[ pos ],1) ,-1);
 // spl2=buffer3[ pos ];
 // spl3=buffer4[ pos ]*0;
