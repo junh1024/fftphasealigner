@@ -90,44 +90,68 @@ tmp=windows+sixtyfivek;
    
    
 pdc_bot_ch=0    ;
-pdc_top_ch=2    ;
+pdc_top_ch=4    ;
 pdc_delay=fft_size;
 
 
 @sample
-buffer1[ pos ] = spl0 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
-buffer1[ pos + 1 ] = 0 ;		//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
+// buffer1[ pos ] = spl0 ;			//first position in buffer1 is sample value from left channel (the real part of the complex number)
+// buffer1[ pos + 1 ] = 0 ;		//second position in the buffer1 in always 0 as the input is real only (= does not have an imaginary aspect (which otherwise is what would have been in this buffer1 position))
 
 
-buffer2[ pos ] = spl1 ;	
-buffer2[ pos + 1 ] = 0 ;
+// buffer2[ pos ] = spl1 ;	
+// buffer2[ pos + 1 ] = 0 ;
 
-pos += 2;
+// pos += 2;//oldplace
 
-buffer3[ pos ] = spl2 ;
-buffer3[ pos + 1 ] = 0 ;
-
-
-buffer4[ pos ] = spl3 ;	
-buffer4[ pos + 1 ] = 0 ;
 
 
 //below: if the buffer1 is full, perform an fft
 
-pos > fft_size_x_two ?
+
+// pos > fft_size_x_two ?
+pos > (fft_size) ?
 (
-	pos = 0;
+
+  t=buffer1;
+  buffer1=buffer1last;
+  buffer1last=t;
+
+   t=buffer2;
+  buffer2=buffer2last;
+  buffer2last=t;
+  
+    t=buffer3;
+  buffer3=buffer3last;
+  buffer3last=t;
+  
+  
+     t=buffer4;
+  buffer4=buffer4last;
+  buffer4last=t;
+	
 	fft( buffer1, fft_size );	
-	// fft_permute( buffer1, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
+	fft_permute( buffer1, fft_size );	//flips the order of the bins so it becomes the way we want it: from low to high frequency (bins)
 	
 	fft( buffer2, fft_size );
-	// fft_permute( buffer2, fft_size );
+	fft_permute( buffer2, fft_size );
 	
 	fft( buffer3, fft_size );
-	// fft_permute( buffer3, fft_size );
+	fft_permute( buffer3, fft_size );
 	
 	fft( buffer4, fft_size );
-	// fft_permute( buffer4, fft_size );
+	fft_permute( buffer4, fft_size );
+	
+	
+		//scaling for correct output
+	i=0;
+	loop(fft_size_x_two,
+	buffer1[i]*=(1/fft_size);
+	buffer2[i]*=(1/fft_size);
+	buffer3[i]*=(1/fft_size);
+	buffer4[i]*=(1/fft_size);
+	i+=1);
+	
 	
 	i=0;
 	loop(fft_size,
@@ -139,8 +163,8 @@ pos > fft_size_x_two ?
 	Angles3[i]=asin(buffer3[i*2+1]/Magnitudes3[i]);
 	Angles4[i]=asin(buffer4[i*2+1]/Magnitudes4[i]);
 	
-	buffer3[(i*2)+1]<0 ? Angles3[i]=Angles3[i]*-1;
-	buffer4[(i*2)+1]<0 ?  Angles4[i]=Angles4[i]*-1 ;
+	// buffer3[(i*2)+1]<0 ? Angles3[i]=Angles3[i]*-1;
+	// buffer4[(i*2)+1]<0 ?  Angles4[i]=Angles4[i]*-1 ;
 
 	buffer1[i*2]  = (Magnitudes1[i]*cos(Angles3[i]));//re
 	buffer1[i*2+1]= (Magnitudes1[i]*sin(Angles3[i]));//im
@@ -151,7 +175,7 @@ pos > fft_size_x_two ?
 	
 	slider8= buffer1[i*2]  ;
 	slider9= buffer1[i*2+1]  ;
-
+pos=0;
 	i+=1;
 	);
 
@@ -164,17 +188,12 @@ pos > fft_size_x_two ?
 	slider7 =Angles4[24];
 	// slider3 =
 	
-	//scaling for correct output
-	i=0;
-	loop(fft_size_x_two,
-	buffer1[i]*=(1/fft_size);
-	buffer2[i]*=(1/fft_size);
-	i+=1);
+
 	
-		// fft_ipermute(buffer2,fft_size);
+		fft_ipermute(buffer2,fft_size);
 	ifft(buffer2,fft_size);
 	
-	// fft_ipermute(buffer1,fft_size);
+	fft_ipermute(buffer1,fft_size);
 	ifft(buffer1,fft_size);
 	
 
@@ -184,29 +203,53 @@ pos > fft_size_x_two ?
 	
 	// fft_ipermute(buffer4,fft_size);
 	// ifft(buffer4,fft_size);
-
+pos = 0;
 );
 
+//startcopy
+w=window[pos*0.5];
+iw=1-w;
 
-// w=window[bpos*0.5];
-// iw=1-w;
+os0=spl0;
+os1=spl1;
+os2=spl2;
+os3=spl3;
 
-// os0=spl0;
-// os1=spl1;
+spl0=(buffer1[pos]*w + buffer1last[fft_size+pos]*iw);
+spl1=(buffer2[pos]*w + buffer2last[fft_size+pos]*iw);
 
-// spl0=(buffer1[pos]*w + lastblock[fftsize+pos]*iw);
-// spl1=(buffer2[pos]*w + lastblock[fftsize+pos+1]*iw);
+// spl2=(buffer3[pos]*w + buffer3last[fft_size+pos]*iw);
+// spl3=(buffer4[pos]*w + buffer4last[fft_size+pos]*iw);
 
-// buffer1last[pos]=buffer1hist[pos];
-// buffer2last[pos]=buffer1hist[pos];
-// buffer1last[fft_sizepos]=os0;
-// buffer2last[fft_sizepos+1]=os1;
-
-// hist[pos]=os0;
-// hist[pos+1]=os1;
+buffer1last[pos]=buffer1hist[pos];
+buffer2last[pos]=buffer2hist[pos];
+buffer1last[fft_size+pos]=os0;
+buffer2last[fft_size+pos]=os1;
 
 
-spl0= max (min( buffer1[ pos ], 1) ,-1);
-spl1= max ( min( buffer2[ pos ],1) ,-1);
-// spl2=buffer3[ pos ];
-// spl3=buffer4[ pos ]*0;
+buffer3last[pos]=buffer3hist[pos];
+buffer4last[pos]=buffer4hist[pos];
+buffer3last[fft_size+pos]=os2;
+buffer4last[fft_size+pos]=os3;
+
+
+buffer1hist[pos]=os0;
+buffer2hist[pos]=os1;
+
+buffer3hist[pos]=os2;
+buffer4hist[pos]=os3;
+//endcopy
+
+// buffer3[ pos ] = spl2 ;
+// buffer3[ pos + 1 ] = 0 ;
+
+
+// buffer4[ pos ] = spl3 ;	
+// buffer4[ pos + 1 ] = 0 ;
+
+
+pos += 2;//oldplace
+
+// spl0= max (min( buffer1[ pos ], 1) ,-1);
+// spl1= max ( min( buffer2[ pos ],1) ,-1);
+
